@@ -6,6 +6,8 @@ import os
 import os.path
 import similarity
 
+num_result = 10
+
 def precision(xs,ys,t,reg):
     correct = 0
     total = 0
@@ -47,8 +49,8 @@ def train():
 
 	rs,xs,ys = dataset(test_path)
 	print 'Threshold\tPrecision\tRecall'
-	for t in range(20):
-		t = 0.5+0.5/20*t
+	for t in range(num_result):
+		t = 0.5+0.5/num_result*t
 		p,total = precision(xs,ys,t,reg)
 		print '%.2f\t%.2f\t%.2f' % (t,p,total)
 	return reg
@@ -70,8 +72,8 @@ def train_gc():
 
 	rs,xs,ys = dataset_gc(test_path)
 	print 'Threshold\tPrecision\tRecall'
-	for t in range(20):
-		t = 0.5+0.5/20*t
+	for t in range(num_result):
+		t = 0.5+0.5/num_result*t
 		p,total = precision(xs,ys,t,reg)
 		print '%.2f\t%.2f\t%.2f' % (t,p,total)
 	return reg
@@ -85,9 +87,9 @@ def test():
 	for i in range(len(rs)):
 		prepared[i] = similarity.prepare(rs[i])
 	print 'Threshold\tPrecision\tRecall\tRounds'
-	for ti in range(20):
+	for ti in range(num_result):
 		xs = [[j for j in i] for i in bxs]
-		t = 0.5 + 0.5/20*ti
+		t = 0.5 + 0.5/num_result*ti
 		reason_set = set()
 		candidate_set = set()
 		for i in range(len(rs)):
