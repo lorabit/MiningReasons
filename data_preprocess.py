@@ -35,9 +35,9 @@ def parse_file(file):
 		for j in non_reasons:
 			if j.find(i)!=-1:
 				p = j.find(i)
-				if p != 0 and len(j[:p-1])>0:
+				if p != 0 and len(j[:p-1])>2:
 					new_non_reasons += [j[:p-1]]
-				if p != len(j)-len(i) and len(j[p+len(i):])>0:
+				if p != len(j)-len(i) and len(j[p+len(i):])>2:
 					new_non_reasons += [j[p+len(i):]]
 			else:
 				new_non_reasons += [j]

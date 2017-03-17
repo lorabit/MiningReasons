@@ -76,44 +76,48 @@ def train_gc():
 		print '%.2f\t%.2f\t%.2f' % (t,p,total)
 	return reg
 
-def test(t):
+def test():
 	ic = train()
 	gc = train_gc()
-	rs,xs,ys = dataset(test_path)
-	reason_set = set()
-	candidate_set = set()
+	rs,bxs,ys = dataset(test_path)
 	prepared = {}
+	print 'Preparing...'
 	for i in range(len(rs)):
-		if ic.predict(xs[i])>t:
-			reason_set.add(i)
-		else:
-			candidate_set.add(i)
 		prepared[i] = similarity.prepare(rs[i])
-	sim = dict()
-	for i in range(len(rs)):
-		for j in range(i):
-			sim[(i,j)] = sim[(j,i)] = similarity.calc(prepared[i],prepared[j])
-	proceed = True
-	for i in candidate_set:
-		xs[i] += [0]
-	rd = 0
-	while proceed:
-		rd += 1
-		print 'Round #%d' %(rd,)
-		proceed = False
-		new_reason = set()
+	print 'Threshold\tPrecision\tRecall\tRounds'
+	for ti in range(20):
+		xs = [[j for j in i] for i in bxs]
+		t = 0.5 + 0.5/20*ti
+		reason_set = set()
+		candidate_set = set()
+		for i in range(len(rs)):
+			if ic.predict(xs[i])>t:
+				reason_set.add(i)
+			else:
+				candidate_set.add(i)
+		sim = dict()
+		for i in range(len(rs)):
+			for j in range(i):
+				sim[(i,j)] = sim[(j,i)] = similarity.calc(prepared[i],prepared[j])
+		proceed = True
 		for i in candidate_set:
-			xs[i][-1] = max([sim[(i,j)] for j in reason_set])
-			if gc.predict(xs[i])>=0.5:
-				new_reason.add(i)
-		for i in new_reason:
-			reason_set.add(i)
-			candidate_set.remove(i)
-			proceed = True
-	print 'Threshold\tPrecision\tRecall'
-	t = 1
-	p,total = set_precision(xs,ys,reason_set)
-	print '%.2f\t%.2f\t%.2f' % (t,p,total)
+			xs[i] += [0]
+		rd = 0
+		while proceed:
+			rd += 1
+			# print 'Round #%d' %(rd,)
+			proceed = False
+			new_reason = set()
+			for i in candidate_set:
+				xs[i][-1] = max([sim[(i,j)] for j in reason_set])
+				if gc.predict(xs[i])>=0.5:
+					new_reason.add(i)
+			for i in new_reason:
+				reason_set.add(i)
+				candidate_set.remove(i)
+				proceed = True
+		p,total = set_precision(xs,ys,reason_set)
+		print '%.2f\t%.2f\t%.2f\t%d' % (t,p,total,rd)
 
 def dataset(path):
 	rs,xs,ys = [],[],[]
@@ -153,7 +157,7 @@ def dataset_gc(path):
 
 
 def main():
-	test(0.94)
+	test()
 			
 
 
